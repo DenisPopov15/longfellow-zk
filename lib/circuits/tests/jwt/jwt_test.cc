@@ -56,6 +56,45 @@ struct jwtest {
   std::vector<OpenedAttribute> attrs;
 };
 
+// The hard-coded JWT test vectors below are ES256-signed JWS bundles
+// consisting of:
+//   id_jwt ~ kb2_jwt
+//
+// where:
+// - id_jwt.header  = {"alg":"ES256","typ":"JWT"}
+// - id_jwt.payload = roughly:
+//     {
+//       "iss": "https://bmi.bund.example/credential/pid/1.0",
+//       "sub": "user12345",
+//       "exp": 1754039830,
+//       "iat": 1754036230,
+//       "given_name": "Erika",
+//       "age_over_18": true,
+//       "cnf": {
+//         "jwk": {
+//           "kty": "EC",
+//           "crv": "P-256",
+//           "x": "<device public key X, base64url>",
+//           "y": "<device public key Y, base64url>"
+//         }
+//       }
+//     }
+// - kb2_jwt.header  = {"alg":"ES256","typ":"kb2+jwt"}
+// - kb2_jwt.payload = roughly:
+//     {
+//       "nonce": "123123123",
+//       "aud":   "RP",
+//       "iat":   1754036230
+//     }
+//
+// The compact JWS strings (header.payload.signature) for these tokens were
+// generated externally with a P-256 key pair, then concatenated with "~".
+// The accompanying fields in jwtest:
+//   - pkx / pky : hex-encoded issuer public key coordinates (P-256),
+//   - e2        : hex-encoded hash of the kb2 message used in the circuit,
+//   - attrs     : the opened attribute, here "given_name" = "Erika",
+// are all consistent with this bundle and are used to drive the witness
+// construction in JWTWitness::compute_witness.
 static const std::vector<jwtest>* tests = new std::vector<jwtest>(
     {{"eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9."
       "eyJpc3MiOiJodHRwczovL2JtaS5idW5kLmV4YW1wbGUvY3JlZGVudGlhbC9waWQvMS4wIiwi"
