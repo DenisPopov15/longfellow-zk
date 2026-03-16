@@ -490,6 +490,40 @@ TEST(jwt, JwtZk11) { test_jwt_zk<11>(); }
 
 TEST(jwt, JwtZk13) { test_jwt_zk<13>(); }
 
+// A variant of the ZK test that highlights a single opened attribute
+// (conceptually similar to a "balance" field revealed in the JWT).
+// It reuses the first test vector in `tests`, which currently checks
+// the equality of a specific string attribute in the payload.
+template <size_t SHABlocks>
+void test_jwt_single_attribute_zk() {
+  set_log_level(INFO);
+  std::unique_ptr<Circuit<Fp256Base>> CIRCUIT =
+      make_circuit<SHABlocks>(p256_base);
+
+  auto W = Dense<Fp256Base>(1, CIRCUIT->ninputs);
+  auto pub = Dense<Fp256Base>(1, CIRCUIT->npub_in);
+
+  const auto& t = tests->at(0);
+
+  if (SHABlocks * 64 - 9 < t.len) {
+    log(INFO, "single-attribute test too big, skipping");
+    return;
+  }
+
+  fill_input<SHABlocks>(W, t, p256_base);
+  fill_input<SHABlocks>(pub, t, p256_base, /*prover=*/false);
+
+  run2_test_zk(
+      *CIRCUIT, W, pub, p256_base,
+      p256_base.of_string("1126492241464102818735004576096902583730188404304894"
+                          "08729223714171582664680802"),
+      p256_base.of_string("8408799435854090769574046142781866056018216899718237"
+                          "8749313018254450460212908"),
+      1ull << 31);
+}
+
+TEST(jwt, JwtSingleAttributeZk11) { test_jwt_single_attribute_zk<11>(); }
+
 // ============ Benchmarks ====================================================
 //
 // To run the benchmarks:

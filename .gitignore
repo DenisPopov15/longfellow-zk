@@ -1,0 +1,21 @@
+# CMake build directories
+clang-build-release/
+build-release/
+build-debug/
+
+# CMake-generated files (if ever created at repo root)
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Local install prefix used in NOTES.md examples
+install/
+
+# macOS / editor cruft
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/
+
